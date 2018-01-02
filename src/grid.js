@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './grid.css';
 
 
-let colors = ['blue','red','green'];
+let colors = ['blue'];
 
 /**
  * 
@@ -34,12 +34,12 @@ const Block = ({ color }) => {
  * 
  * @param {*} param0 
  */
-const ContainerRow = ({ colors }) => {
+const ContainerRow = () => {
   return (
     <div className="containerRow">
-      < Block color={colors[0]} />
-      < Block color={colors[1]} />
-      < Block color={colors[2]} />
+      < Block color={'#fff'} />
+      < Block color={'#fff'} />
+      < Block color={'#fff'} />
     </div>
   )
 }
@@ -60,7 +60,7 @@ const renderGrid = (color, position) => {
   let grid = [];
   for (let i = 0; i < 3; i++) {
     grid.push(<div key={i} className="containerRow">
-      {blocks.slice(i*3, i*3 + 3)}
+      {blocks.slice(i * 3, i * 3 + 3)}
     </div>)
   }
   return grid;
@@ -69,18 +69,22 @@ const renderGrid = (color, position) => {
 
 /**
  * 
- */
-class Grid extends Component {
-  render() {
-    return (
-      <div className="container">
-        < ContainerRow colors={colors} />
-        < ContainerRow colors={colors} />
-        < ContainerRow colors={colors} />
-      </div>
-    )
-  }
-}
+//  */
+// const Container = ({color, position}) => {
+//   return (
+//     <div className="container">
+//       < Block color={'#fff'} />
+//       < Block color={'#fff'} />
+//       < Block color={'#fff'} />
+//       < Block color={'#fff'} />
+//       < Block color={'#fff'} />
+//       < Block color={'#fff'} />
+//       < Block color={'#fff'} />
+//       < Block color={'#fff'} />
+//       < Block color={'#fff'} />
+//     </div>
+//   )
+// }
 
 const calculateSquare = () => {
   let color = randomColor();
@@ -95,7 +99,10 @@ class Game extends Component {
     super(props);
     this.state = {
       started: false,
-      timer: null,
+      timer: null, 
+      color: null,
+      position: null,
+      round:0,
     }
   }
   /**
@@ -110,11 +117,25 @@ class Game extends Component {
 
 
   position = () => {
-    let { color, position } = calculateSquare();
-    this.setState({
-      color,
-      position,
-    })
+    console.log(this.state);
+    if(this.state.round == 0){
+      let { color, position } = calculateSquare();
+      this.setState({
+        color:colors[color],
+        position,
+        round: 1
+      })
+    }else if(this.state.round == 4){
+      this.setState({
+        color:null,
+        position:null,
+        round:0
+      })
+    }else{
+      this.setState({
+        round: this.state.round + 1
+      })
+    }
   }
 
   /**
@@ -122,15 +143,11 @@ class Game extends Component {
    */
   //each interval go through and set the current square, flash the current square
   runGame = () => {
-    let newTimer = setInterval(this.position, 1000);
+    let timer = setInterval(this.position, 500);
     this.setState({
-      timer: newTimer
+      timer
     })
   }
-  /**
-   * 
-   */
-
 
   /**
    * 
@@ -142,10 +159,21 @@ class Game extends Component {
     });
   }
   render() {
-    let grid = renderGrid(this.state.color, this.state.position)
+    let color = this.state.color;
+    let position = this.state.position;
+    let blocks = [];
+    for (let i = 0; i < 9; i++) {
+      if (i == position) {
+        blocks.push(<Block key={i} color={color} />)
+      } else {
+        blocks.push(<Block key={i} color={'#fff'} />)
+      }
+    }
     return (
       <div>
-        {grid}
+        <div className="container">
+          {blocks}
+        </div>
         <button onClick={this.runGame}>Start Game</button>
         <button onClick={this.stopGame}>Stop Game</button>
         <button onClick={this.position}>Test Position</button>
